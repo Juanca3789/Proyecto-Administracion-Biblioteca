@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+
+/* Carlos documente este documento, vago qliao 
+
 using namespace std;
 
 struct Fecha{
@@ -63,10 +66,10 @@ int main(){
 		int opcion;
 		Libro libro;
 		setlocale(LC_ALL, "");
-		system("title Software administración sistema biblioteca");
+		system("title Software administraciÃ³n sistema biblioteca");
 		system("color f0");
 		cout<<"Bienvenido Administrador"<<endl;
-			cout<<"\t Seleccione la opción a utilizar:"<<endl;
+			cout<<"\t Seleccione la opciÃ³n a utilizar:"<<endl;
 				cout<<"\t\t 1.Registrar libro"<<endl;
 				cout<<"\t\t 2.Eliminar libro"<<endl;
 				cout<<"\t\t 3.Buscar libro por titulo"<<endl;
@@ -77,7 +80,7 @@ int main(){
 				cout<<"\t\t 8.Buscar el libro mas costoso"<<endl;
 				cout<<"\t\t 9.Buscar el libro menos costoso"<<endl;
 				cout<<"\t\t 10.Buscar el libro mas vendido"<<endl;
-				cout<<"Digite una opción: "; cin>>opcion;
+				cout<<"Digite una opciÃ³n: "; cin>>opcion;
 		system("cls");
 		switch(opcion){
 			case 1:
@@ -123,8 +126,8 @@ int main(){
 
 void registroLibro(Libro libro){
 	ofstream salida;
-	system("title Software administración sistema biblioteca - Registrar libro");
-	cout<<"Digite la información del libro a registrar: "<<endl;
+	system("title Software administraciÃ³n sistema biblioteca - Registrar libro");
+	cout<<"Digite la informaciÃ³n del libro a registrar: "<<endl;
 		getline(cin, libro.ISBN);
 		cout<<"\tISBN: "; getline(cin, libro.ISBN);
 		cout<<"\tTitulo del libro: "; getline(cin, libro.titulo);
@@ -137,7 +140,7 @@ void registroLibro(Libro libro){
 }
 
 void borrarLibro(Libro libro){
-	system("title Software administración sistema biblioteca - Borrar libro");
+	system("title Software administraciÃ³n sistema biblioteca - Borrar libro");
 	ofstream salida;
 	ifstream entrada;
 	string eliminar;
@@ -180,7 +183,7 @@ void borrarLibro(Libro libro){
 	salida.close();
 	entrada.close();
 	if (existe == true){
-		cout<<"\tEl ISBN ingresado no corresponde a ningún ISBN en el sistema"<<endl<<endl;
+		cout<<"\tEl ISBN ingresado no corresponde a ningÃºn ISBN en el sistema"<<endl<<endl;
 	}
 	else{
 		cout<<"\tLibro eliminado correctamente"<<endl<<endl;
@@ -191,7 +194,7 @@ void buscarTitulo(Libro libro){
 	ifstream entrada;
 	string buscar;
 	int contador = 0;
-	system("title Software administración sistema biblioteca - Buscar libro por titulo");
+	system("title Software administraciÃ³n sistema biblioteca - Buscar libro por titulo");
 	getline(cin, libro.titulo);
 	cout<<"Digite el titulo del libro a buscar: "; getline(cin, libro.titulo);
 	entrada.open("catalogo.csv", ios::in);
@@ -227,7 +230,7 @@ void buscarIsbn(Libro libro){
 	string buscar;
 	int contador = 0;
 	getline(cin, libro.titulo);
-	system("title Software administración sistema biblioteca - Buscar libro por ISBN");
+	system("title Software administraciÃ³n sistema biblioteca - Buscar libro por ISBN");
 	cout<<"Digite el ISBN del libro a buscar: "; getline(cin, libro.ISBN);
 	entrada.open("catalogo.csv", ios::in);
 	while(!entrada.eof()){
@@ -250,7 +253,7 @@ void buscarIsbn(Libro libro){
 		}
 	}
 	if (contador == 0){
-		cout<<"\tNo se han encontrado ningún libro con el ISBN "<<libro.ISBN<<endl<<endl;
+		cout<<"\tNo se han encontrado ningÃºn libro con el ISBN "<<libro.ISBN<<endl<<endl;
 	}
 	entrada.close();
 }
@@ -263,7 +266,7 @@ void abastecerLibro(Libro libro){
 	string buscar;
 	string getcaja;
 	int contador = 0, cantidad, caja, posicion;
-	system("title Software administración sistema biblioteca - Abastecer ejemplares de un libro");
+	system("title Software administraciÃ³n sistema biblioteca - Abastecer ejemplares de un libro");
 	getline(cin, libro.ISBN);
 	cout<<"Digite el ISBN del libro a abastecer: "; getline(cin, libro.ISBN);
 	entrada.open("catalogo.csv", ios::in);
@@ -289,7 +292,7 @@ void abastecerLibro(Libro libro){
 	}
 	entrada.close();
 	if (contador == 0){
-		cout<<"\tNo se han encontrado ningún libro con el ISBN "<<libro.ISBN<<endl<<endl;
+		cout<<"\tNo se han encontrado ningÃºn libro con el ISBN "<<libro.ISBN<<endl<<endl;
 	}
 	else{
 		cajaentrada.open("caja.csv", ios::in);
@@ -304,36 +307,36 @@ void abastecerLibro(Libro libro){
 		}
 		else{
 			int confirmacion;
-			cout<<"\tEl costo de la transacción será de: "<<cantidad*libro.precioCompra<<" ¿Desea realizar la transacción?"<<endl;
-			cout<<"\t1.Confrimar transacción"<<endl;
-			cout<<"\t2. Cancelar transacción"<<endl;
+			cout<<"\tEl costo de la transacciÃ³n serÃ¡ de: "<<cantidad*libro.precioCompra<<" Â¿Desea realizar la transacciÃ³n?"<<endl;
+			cout<<"\t1.Confrimar transacciÃ³n"<<endl;
+			cout<<"\t2. Cancelar transacciÃ³n"<<endl;
 			cout<<"\t\t"; cin>>confirmacion;
 			if(confirmacion == 1){
 				obtenerFecha(libro.transacciones.fechaTransaccion);
 				salida.open("catalogo.csv", ios::app);
 				salida.seekp(posicion);
-				salida<<"Transacción-Abastecimiento-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-";
+				salida<<"TransacciÃ³n-Abastecimiento-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-";
 			}
 		}
 	}
 }
 
 void venderLibro(Libro libro){
-	system("title Software administración sistema biblioteca - Vender ejemplares de un libro");
+	system("title Software administraciÃ³n sistema biblioteca - Vender ejemplares de un libro");
 }
 
 void calcularLibro(Libro libro){
-	system("title Software administración sistema biblioteca - Calcular transacciones de un libro");
+	system("title Software administraciÃ³n sistema biblioteca - Calcular transacciones de un libro");
 }
 
 void masCostoso(Libro libro){
-	system("title Software administración sistema biblioteca - Buscar el libro mas costoso");
+	system("title Software administraciÃ³n sistema biblioteca - Buscar el libro mas costoso");
 }
 
 void menosCostoso(Libro libro){
-	system("title Software administración sistema biblioteca - Buscar el libro menos costoso");
+	system("title Software administraciÃ³n sistema biblioteca - Buscar el libro menos costoso");
 }
 
 void masVendido(Libro libro){
-	system("title Software administración sistema biblioteca - Buscar el libro mas vendido");
+	system("title Software administraciÃ³n sistema biblioteca - Buscar el libro mas vendido");
 }
