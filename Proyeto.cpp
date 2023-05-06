@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-/* Carlos documente este documento, vago qliao */
+/* Carlos documente este codigo, vago qliao */
 
 using namespace std;
 
