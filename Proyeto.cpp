@@ -41,10 +41,46 @@ Fecha obtenerFecha(Fecha &fecha){
 void imprimirLibro(Libro libro){
 	cout<<"\t\tISBN: "<<libro.ISBN<<endl;
 	cout<<"\t\tTitulo: "<<libro.titulo<<endl;
-	cout<<"\t\tPrecio de compra: "<<libro.precioVenta<<endl;
-	cout<<"\t\tPrecio de venta: "<<libro.precioCompra<<endl;
+	cout<<"\t\tPrecio de compra: "<<libro.precioCompra<<endl;
+	cout<<"\t\tPrecio de venta: "<<libro.precioVenta<<endl;
 	cout<<"\t\tInventario: "<<libro.cantidad<<endl;
 }
+
+int buscaIsbn(Libro &libro, string buscar){
+	ifstream entrada;
+	int contador = 0;
+	getline(cin, libro.titulo);
+	cout<<"Digite el ISBN del libro a buscar: "; getline(cin, libro.ISBN);
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		string comparar;
+		getline(entrada, comparar);
+		stringstream linea(comparar);
+		getline(linea, buscar, ';');
+		linea.seekg(0, linea.beg);
+		if(buscar == libro.ISBN){
+			contador++;
+			cout<<"\tSe ha encontrado el libro con ISBN '"<<libro.ISBN<<"'"<<endl;
+					string aux;
+					getline(linea, libro.ISBN, ';');
+					getline(linea, libro.titulo, ';');
+					getline(linea, aux, ';'); libro.precioCompra = stoi(aux);
+					getline(linea, aux, ';'); libro.precioVenta = stoi(aux);
+					getline(linea, aux, ';'); libro.cantidad = stoi(aux);
+					imprimirLibro(libro);
+					cout<<endl;
+		}
+	}
+	if (contador == 0){
+		cout<<"\tNo se han encontrado ningún libro con el ISBN "<<libro.ISBN<<endl<<endl;
+		return 0;
+	}
+	else{
+		return 1;
+	}
+	entrada.close();
+}
+
 //Procedimientos
 void registroLibro(Libro libro);
 void borrarLibro(Libro libro);
@@ -111,13 +147,14 @@ int main(){
 				masVendido(libro);
 				break;
 		}
-	cout<<"0.Volver al menu principal"<<endl;
-	cout<<"1.Cerrar programa"<<endl;
-	int opc;
-	cin>>opc;
-	if(opc == 0){
-		goto principal;
-	}
+	seleccion:
+		cout<<"0.Volver al menu principal"<<endl;
+		cout<<"1.Cerrar programa"<<endl;
+		int opc;
+		cin>>opc;
+		if(opc == 0){
+			goto principal;
+		}
 }
 
 
@@ -223,97 +260,83 @@ void buscarTitulo(Libro libro){
 }
 
 void buscarIsbn(Libro libro){
-	ifstream entrada;
 	string buscar;
-	int contador = 0;
-	getline(cin, libro.titulo);
 	system("title Software administración sistema biblioteca - Buscar libro por ISBN");
-	cout<<"Digite el ISBN del libro a buscar: "; getline(cin, libro.ISBN);
-	entrada.open("catalogo.csv", ios::in);
-	while(!entrada.eof()){
-		string comparar;
-		getline(entrada, comparar);
-		stringstream linea(comparar);
-		getline(linea, buscar, ';');
-		linea.seekg(0, linea.beg);
-		if(buscar == libro.ISBN){
-			contador++;
-			cout<<"\tSe ha encontrado el libro con ISBN '"<<libro.ISBN<<"'"<<endl;
-					string aux;
-					getline(linea, libro.ISBN, ';');
-					getline(linea, libro.titulo, ';');
-					getline(linea, aux, ';'); libro.precioVenta = stoi(aux);
-					getline(linea, aux, ';'); libro.precioCompra = stoi(aux);
-					getline(linea, aux, ';'); libro.cantidad = stoi(aux);
-					imprimirLibro(libro);
-					cout<<endl;
-		}
-	}
-	if (contador == 0){
-		cout<<"\tNo se han encontrado ningún libro con el ISBN "<<libro.ISBN<<endl<<endl;
-	}
-	entrada.close();
+	buscaIsbn(libro, buscar);
 }
 
 void abastecerLibro(Libro libro){
 	ifstream cajaentrada;
 	ofstream cajasalida;
-	ifstream entrada;
+	ifstream entradas;
 	ofstream salida;
 	string buscar;
 	string getcaja;
-	int contador = 0, cantidad, caja, posicion;
+	int contador = 0, caja, existe;
+	libro.transacciones.tipoTransaccion = true;
 	system("title Software administración sistema biblioteca - Abastecer ejemplares de un libro");
-	getline(cin, libro.ISBN);
-	cout<<"Digite el ISBN del libro a abastecer: "; getline(cin, libro.ISBN);
-	entrada.open("catalogo.csv", ios::in);
-	while(!entrada.eof()){
-		string comparar;
-		getline(entrada, comparar);
-		stringstream linea(comparar);
-		getline(linea, buscar, ';');
-		linea.seekg(0, linea.beg);
-		if(buscar == libro.ISBN){
-			contador++;
-			cout<<"\tSe ha encontrado el libro con ISBN '"<<libro.ISBN<<"'"<<endl;
-					string aux;
-					posicion = entrada.tellg();
-					getline(linea, libro.ISBN, ';');
-					getline(linea, libro.titulo, ';');
-					getline(linea, aux, ';'); libro.precioVenta = stoi(aux);
-					getline(linea, aux, ';'); libro.precioCompra = stoi(aux);
-					getline(linea, aux, ';'); libro.cantidad = stoi(aux);
-					imprimirLibro(libro);
-					cout<<endl;
-		}
-	}
-	entrada.close();
-	if (contador == 0){
-		cout<<"\tNo se han encontrado ningún libro con el ISBN "<<libro.ISBN<<endl<<endl;
-	}
-	else{
+	existe = buscaIsbn(libro, buscar);
+	if(existe == 1){
 		cajaentrada.open("caja.csv", ios::in);
 		getline(cajaentrada, getcaja);
 		caja = stoi(getcaja);
 		cout<<"Dinero en caja: "<<caja<<endl;
 		cout<<"Maximo de libros adquiribles: "<<(caja/libro.precioCompra)<<endl;
 		cajaentrada.close();
-		cout<<"\tDigite la cantidad de libros adquirir: "; cin>>cantidad;
-		if((cantidad*libro.precioCompra)>caja){
+		cout<<"\tDigite la cantidad de libros adquirir: "; cin>>libro.transacciones.cantidadTransaccion;
+		if((libro.transacciones.cantidadTransaccion*libro.precioCompra)>caja){
 			cout<<"No hay suficiente dinero en caja para realizar el abastecimiento"<<endl;
 		}
 		else{
 			int confirmacion;
-			cout<<"\tEl costo de la transacción será de: "<<cantidad*libro.precioCompra<<" ¿Desea realizar la transacción?"<<endl;
+			cout<<"\tEl costo de la transacción será de: "<<libro.transacciones.cantidadTransaccion*libro.precioCompra<<" ¿Desea realizar la transacción?"<<endl;
 			cout<<"\t1.Confrimar transacción"<<endl;
-			cout<<"\t2. Cancelar transacción"<<endl;
+			cout<<"\t2.Cancelar transacción"<<endl;
 			cout<<"\t\t"; cin>>confirmacion;
 			if(confirmacion == 1){
 				obtenerFecha(libro.transacciones.fechaTransaccion);
-				salida.open("catalogo.csv", ios::app);
-				salida.seekp(posicion);
-				salida<<"Transacción-Abastecimiento-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-";
+				entradas.open("catalogo.csv", ios::in);
+				salida.open("auxiliar.csv", ios::out);
+				while(!entradas.eof()){
+					string copiar;
+					getline(entradas, copiar);
+					stringstream linea(copiar);
+					getline(linea, buscar, ';');
+					linea.seekg(0, linea.beg);
+					if(buscar == libro.ISBN){
+						while(!linea.eof()){
+							getline(linea, copiar, ';');
+							if(to_string(libro.cantidad) == copiar){
+								libro.cantidad += libro.transacciones.cantidadTransaccion;
+								salida<<libro.cantidad<<";";
+								salida<<"Transacción-"<<libro.transacciones.tipoTransaccion<<"-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-"<<libro.transacciones.cantidadTransaccion;
+							}
+							else{
+								salida<<copiar<<";";
+							}
+						}
+					}
+					else{
+						salida<<endl<<copiar;
+					}
+				}
+				entradas.close();
+				salida.close();
+				entradas.open("auxiliar.csv", ios::in);
+				salida.open("catalogo.csv", ios::out);	
+				while(!entradas.eof()){
+					string copiar;
+					getline(entradas, copiar);
+					salida<<copiar<<endl;
+				}
+				entradas.close();
+				salida.close();
+				cout<<"Transaccion realizada correctamente"<<endl;
 			}
+			cajasalida.open("caja.csv", ios::out);
+				caja -= (libro.transacciones.cantidadTransaccion*libro.precioCompra);
+				cajasalida<<caja;
+			cajasalida.close();
 		}
 	}
 }
