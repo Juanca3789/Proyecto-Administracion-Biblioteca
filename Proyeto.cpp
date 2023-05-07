@@ -292,7 +292,7 @@ void abastecerLibro(Libro libro){
 			cout<<"\tEl costo de la transacción será de: "<<libro.transacciones.cantidadTransaccion*libro.precioCompra<<" ¿Desea realizar la transacción?"<<endl;
 			cout<<"\t1.Confrimar transacción"<<endl;
 			cout<<"\t2.Cancelar transacción"<<endl;
-			cout<<"\t\t"; cin>>confirmacion;
+			cout<<"\t"; cin>>confirmacion;
 			if(confirmacion == 1){
 				obtenerFecha(libro.transacciones.fechaTransaccion);
 				entradas.open("catalogo.csv", ios::in);
@@ -309,7 +309,7 @@ void abastecerLibro(Libro libro){
 							if(to_string(libro.cantidad) == copiar){
 								libro.cantidad += libro.transacciones.cantidadTransaccion;
 								salida<<libro.cantidad<<";";
-								salida<<"Transacción-"<<libro.transacciones.tipoTransaccion<<"-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-"<<libro.transacciones.cantidadTransaccion;
+								salida<<"Transacción-"<<libro.transacciones.tipoTransaccion<<"-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-"<<libro.transacciones.cantidadTransaccion<<";";
 							}
 							else{
 								salida<<copiar<<";";
@@ -367,7 +367,7 @@ void venderLibro(Libro libro){
 			cout<<"\tEl costo de la transacción será de: "<<libro.transacciones.cantidadTransaccion*libro.precioVenta<<" ¿Desea realizar la transacción?"<<endl;
 			cout<<"\t1.Confrimar transacción"<<endl;
 			cout<<"\t2.Cancelar transacción"<<endl;
-			cout<<"\t\t"; cin>>confirmacion;
+			cout<<"\t"; cin>>confirmacion;
 			if(confirmacion == 1){
 				obtenerFecha(libro.transacciones.fechaTransaccion);
 				entradas.open("catalogo.csv", ios::in);
@@ -384,7 +384,7 @@ void venderLibro(Libro libro){
 							if(to_string(libro.cantidad) == copiar){
 								libro.cantidad -= libro.transacciones.cantidadTransaccion;
 								salida<<libro.cantidad<<";";
-								salida<<"Transacción-"<<libro.transacciones.tipoTransaccion<<"-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-"<<libro.transacciones.cantidadTransaccion;
+								salida<<"Transacción-"<<libro.transacciones.tipoTransaccion<<"-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-"<<libro.transacciones.cantidadTransaccion<<";";
 							}
 							else{
 								salida<<copiar<<";";
@@ -420,6 +420,44 @@ void venderLibro(Libro libro){
 
 void calcularLibro(Libro libro){
 	system("title Software administración sistema biblioteca - Calcular transacciones de un libro");
+	ifstream entradas;
+	string buscar;
+	int existe, cantidad=0;
+	existe = buscaIsbn(libro, buscar);
+	if (existe == 1){
+		entradas.open("catalogo.csv", ios::in);
+		while(!entradas.eof()){
+			getline(entradas, buscar);
+			stringstream linea(buscar);
+			getline(linea, buscar, ';');
+			if (buscar == libro.ISBN){
+				for(int i=0; i<3; i++){
+					getline(linea, buscar, ';');
+				}
+				while(!linea.eof()){
+					string imprimir;
+					getline(linea, imprimir, ';');
+					if(imprimir != ""){
+						stringstream transaccion(imprimir);
+							getline(transaccion, imprimir, '-');
+							getline(transaccion, imprimir, '-');
+							if(stoi(imprimir) == 1){
+								cout<<"\tRegistro de transacción: "<<endl;
+								cout<<"\t\tTipo de transacción: ";
+								cout<<"Abastecimiento"<<endl;
+								getline(transaccion, imprimir, '-');
+								cout<<"\t\tFecha de transacción: "<<imprimir<<endl;
+								getline(transaccion, imprimir, '-');
+								cout<<"\t\tCantidad de unidades de transacción: "<<imprimir<<endl;
+								cantidad++;
+							}
+					}
+				}
+			}
+		}
+		cout<<endl<<"\tTotal de transacciones: "<<cantidad<<endl;
+		entradas.close();
+	}
 }
 
 void masCostoso(Libro libro){
