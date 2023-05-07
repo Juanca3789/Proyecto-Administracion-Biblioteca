@@ -315,9 +315,10 @@ void abastecerLibro(Libro libro){
 								salida<<copiar<<";";
 							}
 						}
+						salida<<endl;
 					}
 					else{
-						salida<<endl<<copiar;
+						salida<<copiar<<endl;
 					}
 				}
 				entradas.close();
@@ -342,8 +343,80 @@ void abastecerLibro(Libro libro){
 }
 
 void venderLibro(Libro libro){
+	ifstream cajaentrada;
+	ofstream cajasalida;
+	ifstream entradas;
+	ofstream salida;
+	string buscar;
+	string getcaja;
+	int contador = 0, caja, existe;
+	libro.transacciones.tipoTransaccion = false;
 	system("title Software administración sistema biblioteca - Vender ejemplares de un libro");
+	existe = buscaIsbn(libro, buscar);
+	if(existe == 1){
+		cajaentrada.open("caja.csv", ios::in);
+		getline(cajaentrada, getcaja);
+		caja = stoi(getcaja);
+		cajaentrada.close();
+		cout<<"\tDigite la cantidad de libros a vender: "; cin>>libro.transacciones.cantidadTransaccion;
+		if(libro.transacciones.cantidadTransaccion > libro.cantidad ){
+			cout<<"No hay suficientes unidades en el inventario para realizar esta transacción"<<endl;
+		}
+		else{
+			int confirmacion;
+			cout<<"\tEl costo de la transacción será de: "<<libro.transacciones.cantidadTransaccion*libro.precioVenta<<" ¿Desea realizar la transacción?"<<endl;
+			cout<<"\t1.Confrimar transacción"<<endl;
+			cout<<"\t2.Cancelar transacción"<<endl;
+			cout<<"\t\t"; cin>>confirmacion;
+			if(confirmacion == 1){
+				obtenerFecha(libro.transacciones.fechaTransaccion);
+				entradas.open("catalogo.csv", ios::in);
+				salida.open("auxiliar.csv", ios::out);
+				while(!entradas.eof()){
+					string copiar;
+					getline(entradas, copiar);
+					stringstream linea(copiar);
+					getline(linea, buscar, ';');
+					linea.seekg(0, linea.beg);
+					if(buscar == libro.ISBN){
+						while(!linea.eof()){
+							getline(linea, copiar, ';');
+							if(to_string(libro.cantidad) == copiar){
+								libro.cantidad -= libro.transacciones.cantidadTransaccion;
+								salida<<libro.cantidad<<";";
+								salida<<"Transacción-"<<libro.transacciones.tipoTransaccion<<"-"<<libro.transacciones.fechaTransaccion.dia<<"/"<<libro.transacciones.fechaTransaccion.mes<<"/"<<libro.transacciones.fechaTransaccion.anio<<"-"<<libro.transacciones.cantidadTransaccion;
+							}
+							else{
+								salida<<copiar<<";";
+							}
+						}
+						salida<<endl;
+					}
+					else{
+						salida<<copiar<<endl;
+					}
+				}
+				entradas.close();
+				salida.close();
+				entradas.open("auxiliar.csv", ios::in);
+				salida.open("catalogo.csv", ios::out);	
+				while(!entradas.eof()){
+					string copiar;
+					getline(entradas, copiar);
+					salida<<copiar<<endl;
+				}
+				entradas.close();
+				salida.close();
+				cout<<"Transaccion realizada correctamente"<<endl;
+			}
+			cajasalida.open("caja.csv", ios::out);
+				caja += (libro.transacciones.cantidadTransaccion*libro.precioVenta);
+				cajasalida<<caja;
+			cajasalida.close();
+		}
+	}
 }
+
 
 void calcularLibro(Libro libro){
 	system("title Software administración sistema biblioteca - Calcular transacciones de un libro");
