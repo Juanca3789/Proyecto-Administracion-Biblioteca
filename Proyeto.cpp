@@ -4,7 +4,6 @@
 #include <chrono>
 #include <fstream>
 #include <sstream>
-#include <string>
 using namespace std;
 
 struct Fecha{
@@ -109,7 +108,7 @@ int main(){
 				cout<<"\t\t 4.Buscar libro por ISBN"<<endl;
 				cout<<"\t\t 5.Abastecer ejemplares de un libro"<<endl;
 				cout<<"\t\t 6.Vender ejemplares de un libro"<<endl;
-				cout<<"\t\t 7.Calcular transacciones de un libro"<<endl;
+				cout<<"\t\t 7.Calcular transacciones de abastecimiento de un libro"<<endl;
 				cout<<"\t\t 8.Buscar el libro mas costoso"<<endl;
 				cout<<"\t\t 9.Buscar el libro menos costoso"<<endl;
 				cout<<"\t\t 10.Buscar el libro mas vendido"<<endl;
@@ -159,7 +158,10 @@ int main(){
 
 
 void registroLibro(Libro libro){
+	ifstream entrada;
 	ofstream salida;
+	string buscar;
+	bool existe = false;
 	system("title Software administración sistema biblioteca - Registrar libro");
 	cout<<"Digite la información del libro a registrar: "<<endl;
 		getline(cin, libro.ISBN);
@@ -167,10 +169,25 @@ void registroLibro(Libro libro){
 		cout<<"\tTitulo del libro: "; getline(cin, libro.titulo);
 		cout<<"\tPrecio de compra: "; cin>>libro.precioCompra;
 		cout<<"\tPrecio de venta: "; cin>>libro.precioVenta;
-	salida.open("catalogo.csv", ios::app);
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		getline(entrada, buscar);
+		stringstream linea(buscar);
+		getline(linea, buscar, ';');
+		if(buscar == libro.ISBN){
+			existe = true;
+		}
+	}
+	entrada.close();
+	if(existe == false){
+		salida.open("catalogo.csv", ios::app);
 		salida<<endl<<libro.ISBN<<";"<<libro.titulo<<";"<<libro.precioCompra<<";"<<libro.precioVenta<<";"<<libro.cantidad<<";";
-	salida.close();
-	cout<<"Libro registrado correctamente"<<endl<<endl;
+		salida.close();
+		cout<<"Libro registrado correctamente"<<endl<<endl;
+	}
+	else{
+		cout<<"El libro con ISBN "<<libro.ISBN<<" ya se encuentra registrado"<<endl;
+	}
 }
 
 void borrarLibro(Libro libro){
@@ -462,6 +479,7 @@ void calcularLibro(Libro libro){
 
 void masCostoso(Libro libro){
 	system("title Software administración sistema biblioteca - Buscar el libro mas costoso");
+	
 }
 
 void menosCostoso(Libro libro){
