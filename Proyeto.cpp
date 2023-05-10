@@ -181,7 +181,7 @@ void registroLibro(Libro libro){
 	entrada.close();
 	if(existe == false){
 		salida.open("catalogo.csv", ios::app);
-		salida<<endl<<libro.ISBN<<";"<<libro.titulo<<";"<<libro.precioCompra<<";"<<libro.precioVenta<<";"<<libro.cantidad<<";";
+		salida<<libro.ISBN<<";"<<libro.titulo<<";"<<libro.precioCompra<<";"<<libro.precioVenta<<";"<<libro.cantidad<<";"<<endl;
 		salida.close();
 		cout<<"Libro registrado correctamente"<<endl<<endl;
 	}
