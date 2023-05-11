@@ -6,18 +6,18 @@
 #include <sstream>
 using namespace std;
 
-struct Fecha{
+struct Fecha{	//estructura permite almacenar fecha
 	int dia, mes, anio;
 };
 
-struct Transacciones{
+struct Transacciones{ //estructura de cada transacción del libro
 	bool tipoTransaccion;
 	Fecha fechaTransaccion;
 	int cantidadTransaccion;
 	
 };
 
-struct Libro{
+struct Libro{ //estructura del libro
 	string ISBN;
 	string titulo;
 	int precioCompra;
@@ -27,7 +27,7 @@ struct Libro{
 };
 
 //funciones
-Fecha obtenerFecha(Fecha &fecha){
+Fecha obtenerFecha(Fecha &fecha){ //obtiene la fecha actual del computador
 	time_t now;
     time(&now);
     struct tm *local = localtime(&now);
@@ -37,7 +37,7 @@ Fecha obtenerFecha(Fecha &fecha){
     return fecha;
 }
 
-void imprimirLibro(Libro libro){
+void imprimirLibro(Libro libro){ //imprime la información basica del libro
 	cout<<"\t\tISBN: "<<libro.ISBN<<endl;
 	cout<<"\t\tTitulo: "<<libro.titulo<<endl;
 	cout<<"\t\tPrecio de compra: "<<libro.precioCompra<<endl;
@@ -45,7 +45,7 @@ void imprimirLibro(Libro libro){
 	cout<<"\t\tInventario: "<<libro.cantidad<<endl;
 }
 
-int buscaIsbn(Libro &libro, string buscar){
+int buscaIsbn(Libro &libro, string buscar){ //Selecciona un libro desde el archivo por ISBN
 	ifstream entrada;
 	int contador = 0;
 	getline(cin, libro.titulo);
@@ -80,6 +80,30 @@ int buscaIsbn(Libro &libro, string buscar){
 	entrada.close();
 }
 
+void crearArchivos(){ //Crea los archivos necesarios si aun no existen
+	ifstream entrada;
+	ofstream salida;
+	entrada.open("catalogo.csv", ios::in);
+	if(entrada.fail()){
+		entrada.close();
+		salida.open("catalogo.csv", ios::out);
+		salida.close();
+	}
+	entrada.open("auxiliar.csv", ios::in);
+	if(entrada.fail()){
+		entrada.close();
+		salida.open("auxiliar.csv", ios::out);
+		salida.close();
+	}
+	entrada.open("caja.csv", ios::in);
+	if(entrada.fail()){
+		entrada.close();
+		salida.open("caja.csv", ios::out);
+		salida<<1000000<<endl;
+		salida.close();
+	}
+}
+
 //Procedimientos
 void registroLibro(Libro libro);
 void borrarLibro(Libro libro);
@@ -91,8 +115,10 @@ void calcularLibro(Libro libro);
 void masCostoso(Libro libro);
 void menosCostoso(Libro libro);
 void masVendido(Libro libro);
+void consultarCaja();
 
 int main(){
+	crearArchivos();
 	principal:
 		system("cls");
 		int opcion;
@@ -112,6 +138,7 @@ int main(){
 				cout<<"\t\t 8.Buscar el libro mas costoso"<<endl;
 				cout<<"\t\t 9.Buscar el libro menos costoso"<<endl;
 				cout<<"\t\t 10.Buscar el libro mas vendido"<<endl;
+				cout<<"\t\t 11.Consultar dinero en caja"<<endl;
 				cout<<"Digite una opción: "; cin>>opcion;
 		system("cls");
 		switch(opcion){
@@ -145,6 +172,13 @@ int main(){
 			case 10:
 				masVendido(libro);
 				break;
+			case 11:
+				consultarCaja();
+				break;
+			default:
+				cout<<"Seleccione una opcion valida"<<endl;
+				system("pause");
+				goto principal;
 		}
 	seleccion:
 		cout<<"0.Volver al menu principal"<<endl;
@@ -349,12 +383,15 @@ void abastecerLibro(Libro libro){
 				}
 				entradas.close();
 				salida.close();
-				cout<<"Transaccion realizada correctamente"<<endl;
-			}
-			cajasalida.open("caja.csv", ios::out);
+				cajasalida.open("caja.csv", ios::out);
 				caja -= (libro.transacciones.cantidadTransaccion*libro.precioCompra);
 				cajasalida<<caja;
-			cajasalida.close();
+				cajasalida.close();
+				cout<<"Transaccion realizada correctamente"<<endl;
+			}
+			else{
+				cout<<"Transacción cancelada"<<endl;
+			}
 		}
 	}
 }
@@ -424,12 +461,15 @@ void venderLibro(Libro libro){
 				}
 				entradas.close();
 				salida.close();
-				cout<<"Transaccion realizada correctamente"<<endl;
-			}
-			cajasalida.open("caja.csv", ios::out);
+				cajasalida.open("caja.csv", ios::out);
 				caja += (libro.transacciones.cantidadTransaccion*libro.precioVenta);
 				cajasalida<<caja;
-			cajasalida.close();
+				cajasalida.close();
+				cout<<"Transaccion realizada correctamente"<<endl;
+			}
+			else{
+				cout<<"Transaccion cancelada"<<endl;
+			}
 		}
 	}
 }
@@ -478,8 +518,7 @@ void calcularLibro(Libro libro){
 }
 
 void masCostoso(Libro libro){
-	system("title Software administración sistema biblioteca - Buscar el libro mas costoso");
-	
+	system("title Software administración sistema biblioteca - Buscar el libro mas costoso");	
 }
 
 void menosCostoso(Libro libro){
@@ -488,4 +527,14 @@ void menosCostoso(Libro libro){
 
 void masVendido(Libro libro){
 	system("title Software administración sistema biblioteca - Buscar el libro mas vendido");
+}
+
+void consultarCaja(){
+	system("title Software administración sistema biblioteca - Consultar dinero en caja");
+	ifstream entrada;
+	string valorCaja;
+	entrada.open("caja.csv", ios::in);
+	getline(entrada, valorCaja);
+	entrada.close();
+	cout<<"Dinero en caja: $"<<valorCaja<<endl;
 }
