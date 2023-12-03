@@ -122,7 +122,7 @@ int main(){
 	principal:
 		system("cls");
 		int opcion;
-		Libro libro;
+		Libro *libro = new Libro;
 		setlocale(LC_ALL, "");
 		system("title Software administración sistema biblioteca");
 		system("color f0");
@@ -139,38 +139,42 @@ int main(){
 				cout<<"\t\t 9.Buscar el libro menos costoso"<<endl;
 				cout<<"\t\t 10.Buscar el libro mas vendido"<<endl;
 				cout<<"\t\t 11.Consultar dinero en caja"<<endl;
+				cout<<"\t\t 0.Finalizar ejecución"<<endl;
 				cout<<"Digite una opción: "; cin>>opcion;
 		system("cls");
 		switch(opcion){
+			case 0:
+				goto seleccion;
+				break;
 			case 1:
-				registroLibro(libro);
+				registroLibro(*libro);
 				break;
 			case 2:
-				borrarLibro(libro);
+				borrarLibro(*libro);
 				break;
 			case 3:
-				buscarTitulo(libro);
+				buscarTitulo(*libro);
 				break;
 			case 4:
-				buscarIsbn(libro);
+				buscarIsbn(*libro);
 				break;
 			case 5:
-				abastecerLibro(libro);
+				abastecerLibro(*libro);
 				break;
 			case 6:
-				venderLibro(libro);
+				venderLibro(*libro);
 				break;
 			case 7:
-				calcularLibro(libro);
+				calcularLibro(*libro);
 				break;
 			case 8:
-				masCostoso(libro);
+				masCostoso(*libro);
 				break;
 			case 9:
-				menosCostoso(libro);
+				menosCostoso(*libro);
 				break;
 			case 10:
-				masVendido(libro);
+				masVendido(*libro);
 				break;
 			case 11:
 				consultarCaja();
@@ -180,6 +184,7 @@ int main(){
 				system("pause");
 				goto principal;
 		}
+		delete libro;
 	seleccion:
 		cout<<"0.Volver al menu principal"<<endl;
 		cout<<"1.Cerrar programa"<<endl;
@@ -518,15 +523,154 @@ void calcularLibro(Libro libro){
 }
 
 void masCostoso(Libro libro){
-	system("title Software administración sistema biblioteca - Buscar el libro mas costoso");	
+	system("title Software administración sistema biblioteca - Buscar el libro mas costoso");
+	ifstream entrada;
+	string buscar;
+	int mayor;
+	mayor = 0;
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		string strPrecio;
+		int precio = 0;
+		getline(entrada, buscar);
+		stringstream linea(buscar);
+		for(int i=0; i<4; i++){
+			getline(linea, strPrecio, ';');
+		}
+		if(strPrecio != ""){
+			precio = stoi(strPrecio);
+		}
+		if(precio > mayor){
+			mayor = precio;
+		}
+	}
+	entrada.close();
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		string strPrecio;
+		int precio;
+		getline(entrada, buscar);
+		stringstream linea(buscar);
+		for(int i=0; i<4; i++){
+			getline(linea, strPrecio, ';');
+		}
+		if(strPrecio != ""){
+			precio = stoi(strPrecio);
+		}
+		linea.seekg(0);
+		if(precio == mayor){
+			getline(linea, libro.ISBN, ';');
+			cout<<"Se ha encontrado el libro de mayor precio con ISBN '"<<libro.ISBN<<"'"<<endl;
+					string aux;
+					getline(linea, libro.titulo, ';');
+					getline(linea, aux, ';'); libro.precioCompra = stoi(aux);
+					getline(linea, aux, ';'); libro.precioVenta = stoi(aux);
+					getline(linea, aux, ';'); libro.cantidad = stoi(aux);
+					imprimirLibro(libro);
+					cout<<endl;
+					entrada.close();
+					break;
+		}
+	}
 }
 
 void menosCostoso(Libro libro){
 	system("title Software administración sistema biblioteca - Buscar el libro menos costoso");
+	ifstream entrada;
+	string buscar;
+	int menor = 0, contador = 0;
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		string strPrecio;
+		int precio;
+		getline(entrada, buscar);
+		stringstream linea(buscar);
+		for(int i=0; i<4; i++){
+			getline(linea, strPrecio, ';');
+		}
+		if(strPrecio != ""){
+			precio = stoi(strPrecio);
+		}
+		if(contador == 0){
+			menor = precio;
+			contador++;
+		}
+		if(precio < menor){
+			menor = precio;
+		}
+	}
+	entrada.close();
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		string strPrecio;
+		int precio;
+		getline(entrada, buscar);
+		stringstream linea(buscar);
+		for(int i=0; i<4; i++){
+			getline(linea, strPrecio, ';');
+		}
+		if(strPrecio != ""){
+			precio = stoi(strPrecio);
+		}
+		linea.seekg(0);
+		if(precio == menor){
+			getline(linea, libro.ISBN, ';');
+			cout<<"Se ha encontrado el libro de menor precio con ISBN '"<<libro.ISBN<<"'"<<endl;
+					string aux;
+					getline(linea, libro.titulo, ';');
+					getline(linea, aux, ';'); libro.precioCompra = stoi(aux);
+					getline(linea, aux, ';'); libro.precioVenta = stoi(aux);
+					getline(linea, aux, ';'); libro.cantidad = stoi(aux);
+					imprimirLibro(libro);
+					cout<<endl;
+					entrada.close();
+					break;
+		}
+	}
 }
 
 void masVendido(Libro libro){
 	system("title Software administración sistema biblioteca - Buscar el libro mas vendido");
+	ifstream entrada;
+	string buscar, libroM, seleccionar;
+	int contadorM=0, contador = 0;
+	entrada.open("catalogo.csv", ios::in);
+	while(!entrada.eof()){
+		getline(entrada, libroM);
+		stringstream linea(libroM);
+		for(int i=0; i<5; i++){
+			getline(linea, buscar, ';');
+		}
+		while(!linea.eof()){
+			getline(linea, buscar, ';');
+			stringstream transaccion(buscar);
+			getline(transaccion, buscar, '-');
+			getline(transaccion, buscar, '-');
+			if(buscar == "0"){
+				contador++;
+			}
+		}
+		if(contadorM == 0 || (contadorM < contador)){
+			contadorM = contador;
+			seleccionar = libroM;
+		}
+	}
+	stringstream linea(seleccionar);
+	getline(linea, libro.ISBN, ';');
+	if(libro.ISBN == ""){
+		cout<<"Aun no se realizan transacciones de venta con ningún libro"<<endl;
+	}
+	else{
+		cout<<"Se ha encontrado el libro mas vendido con ISBN '"<<libro.ISBN<<"'"<<endl;
+			string aux;
+			getline(linea, libro.titulo, ';');
+			getline(linea, aux, ';'); libro.precioCompra = stoi(aux);
+			getline(linea, aux, ';'); libro.precioVenta = stoi(aux);
+			getline(linea, aux, ';'); libro.cantidad = stoi(aux);
+			imprimirLibro(libro);
+			cout<<endl;
+	}
+	entrada.close();
 }
 
 void consultarCaja(){
